@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import PyPDF2
 import os
 import sys
