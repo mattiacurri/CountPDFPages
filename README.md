@@ -15,3 +15,6 @@ python3 countNumPDFPages.py -args
 ```
 
 The program accepts infinite (kinda) arguments.
+
+### How to use it in any folder (Linux)
+See: [https://stackoverflow.com/questions/6967331/how-do-i-install-a-script-to-run-anywhere-from-the-command-line](https://stackoverflow.com/questions/6967331/how-do-i-install-a-script-to-run-anywhere-from-the-command-line)
