@@ -19,7 +19,11 @@ for i in range(1, n):
             if f.endswith('.pdf'):
                 file = open(f, 'rb')
                 readpdf = PyPDF2.PdfReader(file)
-                sum += len(readpdf.pages)
+                try:
+                    sum += len(readpdf.pages)
+                except PyPDF2.errors.FileNotDecryptedError:
+                    print("File:", f.replace(directory[i] + "\\", ""), "is encrypted; ignored.")
+                    continue
                 print("File:", f.replace(directory[i] + "\\", ""), "Num pages:", len(readpdf.pages))
                 sumDir[i] = sum
     else:
