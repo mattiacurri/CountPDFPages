@@ -3,14 +3,27 @@ import PyPDF2
 import os
 import sys
 
+from rich.console import Console
+from rich.theme import Theme
+
+# add style
+custom_theme = Theme({
+    "good" : "bold gold3",
+    "bad": "bold red",
+    "title": "bold green",
+    "black": "black",
+    "highlight": "bold blue"
+})
+console = Console(theme=custom_theme)
+
 n = len(sys.argv)
 sumDir = [-1] * n
 directory = [-1] * n
 
 for i in range(1, n):
     print()
-    print("Path number", i)
-    sum = 0
+    console.print(f"Path number {i}: [good]{sys.argv[i]}[/good]", style="title")
+    sum_pages = 0
     directory[i] = sys.argv[i]
 
     if os.path.exists(directory[i]):
@@ -20,14 +33,12 @@ for i in range(1, n):
                 file = open(f, 'rb')
                 readpdf = PyPDF2.PdfReader(file)
                 try:
-                    sum += len(readpdf.pages)
+                    sum_pages += len(readpdf.pages)
                 except PyPDF2.errors.FileNotDecryptedError:
-                    print("File:", f.replace(directory[i] + "\\", ""), "is encrypted; ignored.")
+                    console.print("[black]File:[/black]", f.replace(directory[i] + "\\", ""), "is encrypted; ignored.", style="bad")
                     continue
-                print("File:", f.replace(directory[i] + "\\", ""), "Num pages:", len(readpdf.pages))
-                sumDir[i] = sum
+                console.print(f"[black]File:[/black] [good]{f.replace(directory[i] + '\\', '')}[/good] Num pages: {len(readpdf.pages)}", style="title")
     else:
-        print("Argument number", i, "not found")
+        console.print(f"Argument number {i} not found", style="bad")
 
-filteredSum = [x for x in sumDir if x != -1]
-print(filteredSum)
+    console.print(f"Total number of pages: {sum_pages}", style="highlight")
