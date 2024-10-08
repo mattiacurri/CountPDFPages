@@ -2,10 +2,10 @@
 The following script count the number of pages in PDF files present in a directory
 
 ## How to use it
-You will need python3 and the package PyPDF2:
+You will need python3 and the packages in requirements:
 
 ```
-pip install PyPDF2
+pip install -r requirements.txt
 ```
 
 To execute the program:
