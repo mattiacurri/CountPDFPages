@@ -1,10 +1,12 @@
 #!/usr/bin/python
-import PyPDF2
+import pypdf
 import os
 import sys
 
 from rich.console import Console
 from rich.theme import Theme
+
+from tabulate import tabulate
 
 # add style
 custom_theme = Theme({
@@ -12,33 +14,37 @@ custom_theme = Theme({
     "bad": "bold red",
     "title": "bold green",
     "black": "black",
-    "highlight": "bold blue"
+    "highlight": "bold blue",
 })
 console = Console(theme=custom_theme)
 
 n = len(sys.argv)
-sumDir = [-1] * n
-directory = [-1] * n
+sumDir = [0] * n
+directory = [0] * n
 
 for i in range(1, n):
     print()
     console.print(f"Path number {i}: [good]{sys.argv[i]}[/good]", style="title")
-    sum_pages = 0
     directory[i] = sys.argv[i]
+    table_data = []
 
     if os.path.exists(directory[i]):
+        sum_pages = 0
         for filename in os.listdir(directory[i]):
             f = os.path.join(directory[i], filename)
             if f.endswith('.pdf'):
                 file = open(f, 'rb')
-                readpdf = PyPDF2.PdfReader(file)
+                readpdf = pypdf.PdfReader(file)
                 try:
-                    sum_pages += len(readpdf.pages)
-                except PyPDF2.errors.FileNotDecryptedError:
-                    console.print("[black]File:[/black]", f.replace(directory[i] + "\\", ""), "is encrypted; ignored.", style="bad")
+                    num_pages = len(readpdf.pages)  # Calculate num_pages once
+                    sum_pages += num_pages
+                    table_data.append([f.replace(directory[i] + "\\", ""), num_pages])
+                except pypdf.errors.FileNotDecryptedError:
+                    table_data.append([f.replace(directory[i] + "\\", ""), "Encrypted; ignored"])
                     continue
-                console.print(f"[black]File:[/black] [good]{f.replace(directory[i] + '\\', '')}[/good] Num pages: {len(readpdf.pages)}", style="title")
     else:
         console.print(f"Argument number {i} not found", style="bad")
-
-    console.print(f"Total number of pages: {sum_pages}", style="highlight")
+        continue
+    table_data.append(["\033[1mTotal pages:\033[0m", sum_pages])
+    trimmed_table_data = [[os.path.basename(row[0]), row[1]] for row in table_data]
+    print(tabulate(trimmed_table_data, headers=["\033[1mFile\033[0m", "\033[1mNum pages\033[0m"], tablefmt="fancy_grid"))
